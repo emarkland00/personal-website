@@ -1,0 +1,19 @@
+# No directory listing
+<Files ".htaccess">
+    Order allow,deny
+    Deny from all
+</Files>
+
+Options -Indexes
+
+# IP to domain (https)
+RewriteEngine on
+RewriteCond %{HTTP_HOST} !^errolmarkland.com
+RewriteRule (.*) https://errolmarkland.com/$1 [R=301,L]
+
+# /resume --> straight to pdf
+RewriteRule ^resume$ errol_resume.pdf [NC]
+
+# Remove file ending (/index.php -> /index)
+RewriteRule ^([a-zA-Z]+)$ $1.php [NC]
+RewriteRule ^handlers/([a-zA-Z]+)$ $1.php [NC]
