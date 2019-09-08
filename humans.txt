@@ -6,11 +6,11 @@ Feel free to reach out to me for any questions or suggestions.
     Webmaster: Errol Markland
     Site: errolmarkland.com
     Twitter: @mr_markland
-    Github: https://github.com/emarkland
+    Github: https://github.com/emarkland00
     From: New York, NY USA
 
 # SITE
-    Last-updated: 2019/07/21
+    Last-updated: 2019/09/07
     Language: English
     Standards: HTML5, CSS3, JS
     Editor: vscode
