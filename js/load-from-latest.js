@@ -4,15 +4,6 @@
     if (!latest_json || latest_json.error) {
         return;
     }
-    const templateStringer = json => `
-    <div class="4u 12u(mobile) article-item">
-        <a href="${json.url}" target="_blank">
-            <section class="box style1">
-                <h4>${json.title}</h4>
-                <p> <span class="latest-entry-content-item-source">[saw on ${json.source}]</span></p> 
-            </section>
-        </a>
-    </div>`;
     
     // helper methods for parsing json payload
     const getSource = json => {
@@ -45,7 +36,16 @@
         // Change this to div.childNodes to support multiple top-level nodes
         return div.firstChild;
     };
-    const createArticle = json => createHtmlElement(templateStringer(json));
+    const jsonToHtmlString = json =>
+        `<div class="4u 12u(mobile) article-item">
+            <a href="${json.url}" target="_blank">
+                <section class="box style1">
+                    <h4>${json.title}</h4>
+                    <p> <span class="latest-entry-content-item-source">[saw on ${json.source}]</span></p> 
+                </section>
+            </a>
+        </div>`;  
+    const createArticle = json => createHtmlElement(jsonToHtmlString(json));
     jsonResults.forEach(json => {
         const elem = createArticle(json);
         contentContainer.append(elem);
