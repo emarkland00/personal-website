@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/errolmarkland
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://errolmarkland.com
+  * I am errolmarkland (https://keybase.io/errolmarkland) on keybase.
+  * I have a public key ASADjrD4wW9JkV_4_EC4rITRfQFVTYAYpY3SlnmLSZLwOgo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120038eb0f8c16f49915ff8fc40b8ac84d17d01554d8018a58dd296798b4992f03a0a",
+      "host": "keybase.io",
+      "kid": "0120038eb0f8c16f49915ff8fc40b8ac84d17d01554d8018a58dd296798b4992f03a0a",
+      "uid": "126e2ece99ba62a8ef7b087b1e4c7b19",
+      "username": "errolmarkland"
+    },
+    "merkle_root": {
+      "ctime": 1568549949,
+      "hash": "00dd380bc2a10b57d49179ee5d9ecebf3ed825054519714afb056ba782e59818c7c0858697633103ab62f9d98761675808fe65403fca8c8bf2389a1060739192",
+      "hash_meta": "ea7b74f297ae7c0858641307b922b49fb8ff071ca9a1c42779768f4372c08217",
+      "seqno": 7390811
+    },
+    "service": {
+      "entropy": "d8adDB5iPetuocvjhv4H4fDu",
+      "hostname": "errolmarkland.com",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "4.4.2"
+  },
+  "ctime": 1568549967,
+  "expire_in": 504576000,
+  "prev": "9a252d878199c3454f1b3974632031c44f60546a5d34cd79f88fcab4860426d0",
+  "seqno": 10,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgA46w+MFvSZFf+PxAuKyE0X0BVU2AGKWN0pZ5i0mS8DoKp3BheWxvYWTESpcCCsQgmiUth4GZw0VPGzl0YyAxxE9gVGpdNM15+I/KtIYEJtDEIF2gymRhk9XyNoGN7vK/aKmloKsNMWNCWzBr68J5Yd/RAgHCo3NpZ8RA2n59vCXxMq1J0NmwvGdZ0QiGxjHsZnbxYn1qYTkHd2dz83pPuFWVVRYZJpgGr1Rhmhw3JjE8O5GgjwnnojCXCahzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIIJwojkL85IlRjbNVAE/EKxVlxF/UPUGO+nVfZLPkVsPo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/errolmarkland
+
+==================================================================
