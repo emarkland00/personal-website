@@ -1,7 +1,10 @@
 (function() {
     'use strict'
 
+    const comingSoonMessage = 'Content coming soon!';
+    const contentContainer = document.getElementById('latest-entry-content');
     if (!latest_json || latest_json.error) {
+        contentContainer.append(comingSoonMessage);
         return;
     }
     
@@ -23,7 +26,6 @@
         url: getUrl(json)
     })).reverse(); // reverse items to display most recent articles from left to right
 
-    const contentContainer = document.getElementById('latest-entry-content');
     if (!jsonResults) {
         contentContainer.append("Content coming soon!");
         return;
