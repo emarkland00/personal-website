@@ -1,5 +1,7 @@
 (function() {
     'use strict'
+    
+    const ID_CONTENT_CONTAINER
 
     const comingSoonMessage = 'Content coming soon!';
     const contentContainer = document.getElementById('latest-entry-content');
