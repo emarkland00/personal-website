@@ -8,6 +8,9 @@ For local development, it is recommended to ensure that
 - For testing values, populate the array as
 ```
 const latest_json = [{
-    ... array of objects
-}]
+    source: <string>, // where the article was found
+    title: <string>, // the title of the article
+    url: <string>, // the link to the article
+}
+...]
 ```
