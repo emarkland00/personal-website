@@ -27,7 +27,7 @@
     })).reverse(); // reverse items to display most recent articles from left to right
 
     if (!jsonResults) {
-        contentContainer.append("Content coming soon!");
+        contentContainer.append(comingSoonMessage);
         return;
     }
 
