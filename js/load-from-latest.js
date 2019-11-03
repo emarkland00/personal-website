@@ -5,7 +5,7 @@
     const ID_ARTICLE_CONTENT_ENTRY = 'latest-entry-content';
     const ID_ARTICLE_FOOTER = 'article-footer';
 
-    if (!window.latest_json) {
+    if (typeof latest_json === 'undefined') {
         document.getElementById(ID_ARTICLE_CONTENT).innerHTML = `<p>Content coming soon!</p>`;
         document.getElementById(ID_ARTICLE_FOOTER).style.display = 'none';
         return;
