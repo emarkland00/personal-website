@@ -1,12 +1,13 @@
 (function() {
     'use strict'
     
-    const ID_CONTENT_CONTAINER
+    const ID_ARTICLE_CONTENT = 'latest-articles';
+    const ID_ARTICLE_CONTENT_ENTRY = 'latest-entry-content';
+    const ID_ARTICLE_FOOTER = 'article-footer';
 
-    const comingSoonMessage = 'Content coming soon!';
-    const contentContainer = document.getElementById('latest-entry-content');
-    if (!latest_json) {
-        contentContainer.append(comingSoonMessage);
+    if (!window.latest_json) {
+        document.getElementById(ID_ARTICLE_CONTENT).innerHTML = `<p>Content coming soon!</p>`;
+        document.getElementById(ID_ARTICLE_FOOTER).style.display = 'none';
         return;
     }
 
@@ -26,6 +27,7 @@
             </a>
         </div>`;  
     const createArticle = json => createHtmlElement(jsonToHtmlString(json));
+    const contentContainer = document.getElementById(ID_ARTICLE_CONTENT_ENTRY);
     latest_json.forEach(json => {
         const elem = createArticle(json);
         contentContainer.append(elem);
