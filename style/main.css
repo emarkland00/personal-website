@@ -2112,3 +2112,37 @@
 	.project-image {
 		padding: 4px;
 	}
+
+	pre {
+        font-family: "Courier 10 Pitch", Courier, monospace;
+        line-height: 140%;
+        white-space: pre;
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+		white-space: -o-pre-wrap;
+		text-align: left;
+		max-width: 600px
+    }       
+    
+    code {
+        font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+        line-height: 140%;
+        white-space: pre;
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -o-pre-wrap;
+        background: #faf8f0;
+    }
+    
+    code {
+        display: block;
+        padding: 0.5em 1em;
+		border: 1px solid #bebab0;
+		text-align: left
+	}
+	
+	.crypto-addresses {
+		width: 45%;
+		margin-left: auto;
+		margin-right: auto;
+	}
