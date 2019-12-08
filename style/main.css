@@ -2108,3 +2108,7 @@
 	.article-item > a {
 	  text-decoration: none;
 	}
+
+	.project-image {
+		padding: 4px;
+	}
