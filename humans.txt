@@ -10,7 +10,7 @@ Feel free to reach out to me for any questions or suggestions.
     From: New York, NY USA
 
 # SITE
-    Last-updated: 2022/01/07
+    Last-updated: 2022-03-07
     Language: English
     Standards: HTML5, CSS3, JS
     Editor: vscode
