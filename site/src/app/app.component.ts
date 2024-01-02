@@ -18,17 +18,9 @@ export class AppComponent implements OnInit {
   readonly ID_ARTICLE_CONTENT_ENTRY: string = 'latest-entry-content';
   readonly ID_ARTICLE_FOOTER: string = 'article-footer';
   readonly MOCK_ITEMS: any[] = [{
-    "source": "YouTube",
-    "title": "A Daily Practice of Empirical Software Design - Kent Beck - DDD Europe 2023",
-    "url": "https://youtube.com/watch?v=yBEcq23OgB4&si=L2ljKr2kvWzVGJVg"
-  }, {
-      "source": "www.maxcountryman.com",
-      "title": "A Framework for Prioritizing Tech Debt",
-      "url": "https://www.maxcountryman.com/articles/a-framework-for-prioritizing-tech-debt"
-  }, {
-      "source": "jvns.ca",
-      "title": "A debugging manifesto",
-      "url": "https://jvns.ca/blog/2022/12/08/a-debugging-manifesto/"
+    "source": "MOCK",
+    "title": "MOCK TITLE",
+    "url": "https://google.com"
   }];
   title = 'site';
 

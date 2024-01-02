@@ -7,8 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "docker:dev": "ng serve --host 0.0.0.0 --port 4200 --disable-host-check --poll 250",
-    "docker:build:prod": "ng build --prod --aot --build-optimizer --output-hashing=all"
+    "docker:dev": "./node_modules/.bin/ng serve --host 0.0.0.0 --port 4200 --disable-host-check --poll 250",
+    "docker:build:prod": "./node_modules/.bin/ng build --configuration=production"
   },
   "private": true,
   "dependencies": {
