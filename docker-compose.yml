@@ -1,0 +1,15 @@
+version: "3.8"
+   
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev-runner
+      args:
+        - NODE_ENV=development
+    ports:
+      - "4200:4200"
+    container_name: "app"
+    volumes:
+      - ./site/src/:/code/src/
