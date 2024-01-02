@@ -40,7 +40,7 @@ RUN apt-get update && apt-get install -y
 COPY --from=app-base . .
 
 # Copy build contents to nginx
-RUN ${BUILD_CMD}
+RUN npm run docker:build:prod
 RUN cp -r /code/dist/ /usr/share/nginx/html
 
 # Copy the nginx configuration
@@ -64,4 +64,4 @@ RUN apt-get update && apt-get install -y
 
 RUN npm install -g npm-check-updates @angular/cli
 RUN npm install --include=dev --legacy-peer-deps
-CMD [ "ng", "serve", "--host", "0.0.0.0", "--port", "4200", "--disable-host-check", "--poll", "250" ]
+CMD [ "npm", "run", "docker:dev" ]

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-import { Observable, from, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 @Component({
@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     //TODO: Get lambda function for latest articles stored in a repo
-    this.latestJson$ = this.http.get<any[]>('/js/latest.json').pipe(
+    this.latestJson$ = this.http.get<any[]>('/assets/latest.json').pipe(
       catchError(err => {
         console.log(err);
         return of(this.MOCK_ITEMS);
