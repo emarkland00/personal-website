@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+
+  build:
+    commands:
+      - cd site && npm install && npm install --include=dev --legacy-peer-deps && npm run docker:build:prod
+  post_build:
+    artifacts:
+      files:
+        - 'dist/site/browser/**/*'
+      base-directory: site
