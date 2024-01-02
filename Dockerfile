@@ -4,6 +4,10 @@
 ARG NODE_ENV=production
 ARG WORKDIR=/code
 
+# build flows
+# app-base -> app-build-base -> prod-builder
+#          -> dev-runner 
+
 FROM node:20.9.0-bookworm-slim as app-base
 # Install system dependencies
 RUN apt-get update && apt-get install -y
@@ -18,13 +22,24 @@ WORKDIR ${WORKDIR}
 
 # Copy app source
 COPY ./site/ /code/
-RUN npm install && \
-    npm install --include=dev --legacy-peer-deps && \
-    npm run docker:build:prod
-
-
+RUN npm install
 
 FROM node:20.9.0-bookworm-slim as app-build-base
+# Install system dependencies
+RUN apt-get update && apt-get install -y
+COPY --from=app-base /code /code
+
+# Input arguments
+ARG NODE_ENV
+ARG WORKDIR
+
+ENV NODE_ENV=${NODE_ENV}
+# Set working directory
+WORKDIR ${WORKDIR}
+
+RUN npm install --include=dev --legacy-peer-deps && \
+    npm run docker:build:prod
+
 
 # Build the app for production
 FROM nginx:1.25-bookworm as prod-builder
@@ -37,7 +52,7 @@ ENV NODE_ENV=${NODE_ENV}
 RUN apt-get update && apt-get install -y
 
 # Copy installed dependencies from builder
-COPY --from=app-base /code/dist/site/browser /usr/share/nginx/html
+COPY --from=app-build-base /code/dist/site/browser /usr/share/nginx/html
 
 # Copy the nginx configuration
 COPY nginx/nginx.conf  /etc/nginx/conf.d/default.conf
@@ -57,6 +72,6 @@ COPY --from=app-base /code /code
 # Install system dependencies
 RUN apt-get update && apt-get install -y
 
-RUN npm install -g npm-check-updates @angular/cli
-RUN npm install --include=dev --legacy-peer-deps
+RUN npm install -g npm-check-updates @angular/cli && \
+    npm install --include=dev --legacy-peer-deps
 CMD [ "npm", "run", "docker:dev" ]
