@@ -12,5 +12,5 @@ phases:
 
 artifacts:
   files:
-    - artifacts/**/*
-  base-directory: site
+    - '**/*'
+  base-directory: artifacts
