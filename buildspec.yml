@@ -8,9 +8,8 @@ phases:
   build:
     commands:
       - cd site && npm install && npm install --include=dev --legacy-peer-deps && npm run docker:build:prod
-      - mkdir artifacts && cp -r dist/site/browser/* artifacts/
 
 artifacts:
   files:
     - '**/*'
-  base-directory: artifacts
+  base-directory: 'site/dist/site/browser'
