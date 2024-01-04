@@ -1,3 +1,4 @@
+#929593019011.dkr.ecr.us-east-1.amazonaws.com/tracker
 version: 0.2
 
 phases:
@@ -7,7 +8,20 @@ phases:
 
   build:
     commands:
-      - cd site && npm install && npm install --include=dev --legacy-peer-deps && npm run docker:build:prod
+      # Get home directory
+      - export HOME_DIR=`pwd`
+
+      # Build the website
+      - cd $HOME_DIR/site && npm install && npm install --include=dev --legacy-peer-deps && npm run docker:build:prod
+
+      # Build the API (https://docs.aws.amazon.com/lambda/latest/dg/nodejs-image.html)
+      - cd $HOME_DIR/backend/lambdas/tracker
+      - docker build --platform linux/amd64 -f Dockerfile.lambda -t docker-image:test .
+      - $(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com)
+      - docker tag docker-image:test $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
+
+
 
 artifacts:
   files:
