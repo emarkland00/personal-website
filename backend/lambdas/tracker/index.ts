@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"; // ES Modules import
 
@@ -14,6 +14,16 @@ const KEY_NAME_JSON = "assets/latest.json";
 const ACL = 'public-read';
 const s3 = new S3Client();
 
+// Interaces for Pocket API request
+interface PocketJsonRequest {
+    consumer_key: string,
+    access_token: string,
+    tag: string,
+    count: string,
+    detailType: string
+}
+
+// Interfaces for Pocket API response
 interface PocketJsonResponseInfo {
     domain_metadata: {
         name: string
@@ -80,12 +90,12 @@ const normalizePocketJsonResponse = (jsonResponse: PocketJsonResponse): TrackerJ
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
     // pocket api constants
     const apiUrl = process.env.POCKET_API_URL || POCKET_API_URL;
-    const payload = {
-        "consumer_key": process.env.POCKET_CONSUMER_KEY,
-        "access_token": process.env.POCKET_ACCESS_TOKEN,
-        "tag": "tracker",
-        "count": "3",
-        "detailType": "simple"
+    const payload: PocketJsonRequest = {
+        consumer_key: process.env.POCKET_CONSUMER_KEY || '',
+        access_token: process.env.POCKET_ACCESS_TOKEN || '',
+        tag: "tracker",
+        count: "3",
+        detailType: "simple"
     };
     
     console.log(`API Url is ${apiUrl}`);
