@@ -119,14 +119,13 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
     }
     
     console.log('Successfully normalized API response')
-    const jsString = `const latest_json = ${normalizedJson};`;
-    await putLatestToS3(context, jsString, KEY_NAME_JS);
-    await putLatestToS3(context, JSON.stringify(normalizedJson), KEY_NAME_JSON);
+    const jsonString = JSON.stringify(normalizedJson);
+    await putLatestToS3(context, jsonString, KEY_NAME_JSON);
     console.log("Successfully uploaded changes to S3");
 
     return {
         statusCode: 200,
         headers: { 'Content-Type': 'text/javascript' },
-        body: jsString
+        body: jsonString
     };
 };
