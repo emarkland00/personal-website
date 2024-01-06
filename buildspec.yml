@@ -23,7 +23,7 @@ phases:
   post_build:
     commands:
       # Deploy the API
-      - aws lambda update-function-code --function-name tracker --image-uri $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$COMMIT_HASH
+      - aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --image-uri $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:$COMMIT_HASH
 
 
 
