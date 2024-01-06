@@ -14,7 +14,7 @@ phases:
       # Build the API (https://docs.aws.amazon.com/lambda/latest/dg/nodejs-image.html)
       - cd $CODEBUILD_SRC_DIR/backend/lambdas/tracker
       - docker build --platform linux/amd64 -f Dockerfile.lambda -t docker-image:test .
-      - $(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com)
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com
       - docker tag docker-image:test $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
 
