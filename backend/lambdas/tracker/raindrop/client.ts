@@ -1,7 +1,6 @@
 import axios, { AxiosInstance, isAxiosError } from 'axios';
 import { CollectionsApiResponse, CollectionItem } from './interfaces/collection';
 import { RaindropsApiResponse, RaindropItem } from './interfaces/raindrop';
-import { get } from 'http';
 
 // --- Private Helper Function ---
 
@@ -77,7 +76,7 @@ const getRaindropCollections = (client: AxiosInstance): () => Promise<Collection
 const getRaindropItems = (client: AxiosInstance): (collectionId: number) => Promise<RaindropItem[]> => {
   return async (collectionId: number): Promise<RaindropItem[]> => {
     try {
-      const response = await client.get<RaindropsApiResponse>(`/raindrops/${collectionId}`);
+      const response = await client.get<RaindropsApiResponse>(`/raindrops/${collectionId}?sort=-created&perpage=3`);
       if (response.data.result) {
         return response.data.items;
       }

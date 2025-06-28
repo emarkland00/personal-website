@@ -1,42 +1,16 @@
 import dotenv from 'dotenv';
-import axios from 'axios';
 import { Context, APIGatewayProxyResult, APIGatewayEvent } from 'aws-lambda';
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"; // ES Modules import
+import { createRaindropApiClient, RaindropApiClient } from './raindrop/client';
+import { RaindropItem } from './raindrop/interfaces/raindrop';
 
 // Load environment variables from .env file
 dotenv.config();
 
-const POCKET_API_URL = 'https://getpocket.com/v3/get';
-
 const BUCKET_NAME = 'errolmarkland.com';
-const KEY_NAME_JS = 'js/latest.js';
 const KEY_NAME_JSON = "assets/latest.json";
 const ACL = 'public-read';
 const s3 = new S3Client();
-
-// Interaces for Pocket API request
-interface PocketJsonRequest {
-    consumer_key: string,
-    access_token: string,
-    tag: string,
-    count: string,
-    detailType: string
-}
-
-// Interfaces for Pocket API response
-interface PocketJsonResponseInfo {
-    domain_metadata: {
-        name: string
-    },
-    resolved_title: string,
-    resolved_url: string,
-    given_url: string;
-}
-interface PocketJsonResponse {
-    list: {
-        [key: string]: PocketJsonResponseInfo
-    }
-}
 
 interface TrackerJson {
     source: string,
@@ -61,71 +35,57 @@ async function putLatestToS3(context: Context, jsString: string, key: string) {
     }
 }
 
-// helper methods for parsing json payload from pocket
-const getSource = (json: PocketJsonResponseInfo): string => {
-    if (json.domain_metadata?.name) {
-        return json.domain_metadata.name;
-    }
-    
-    // If domain metadata not present, use URL hostname as source
-    const urlObject = new URL(json.resolved_url || json.given_url);
-    return urlObject.hostname;
-};
-const getTitle = (json: PocketJsonResponseInfo): string => json.resolved_title;
-const getUrl = (json: PocketJsonResponseInfo): string => json.resolved_url;
-
-const normalizePocketJsonResponse = (jsonResponse: PocketJsonResponse): TrackerJson[] => {
-    const responseJsonList = jsonResponse.list;
-    if (!responseJsonList) return [];
-    
-    const jsonResults = Object.values(responseJsonList).map(json => ({
-        source: getSource(json),
-        title: getTitle(json),
-        url: getUrl(json)
-    }));
-    
-    return jsonResults.reverse();
-};
-
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
     // pocket api constants
-    const apiUrl = process.env.POCKET_API_URL || POCKET_API_URL;
-    const payload: PocketJsonRequest = {
-        consumer_key: process.env.POCKET_CONSUMER_KEY || '',
-        access_token: process.env.POCKET_ACCESS_TOKEN || '',
-        tag: "tracker",
-        count: "3",
-        detailType: "simple"
-    };
-    
-    console.log(`API Url is ${apiUrl}`);
-    console.log(`Payload is ${JSON.stringify(payload, null, 4)}`);
-    // s3 constants
-    const { data: resJson } = await axios.post<PocketJsonResponse>(apiUrl, payload, {
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    });
-    console.log('Successfully fetched API response');
-    console.log(JSON.stringify(resJson, null, 4));
-
-    console.log('Successfully parsed API response to JSON');
-    const normalizedJson = normalizePocketJsonResponse(resJson);
-    if (!normalizedJson) {
+    const apiKey: string = process.env.ACCESS_TOKEN || '';
+    if (!apiKey) {
+        console.error('No API key provided');
         return {
             statusCode: 500,
-            body: "Failed to parse the normalize the json response from API"
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'API key is required' })
         };
     }
-    
-    console.log('Successfully normalized API response')
-    const jsonString = JSON.stringify(normalizedJson);
-    await putLatestToS3(context, jsonString, KEY_NAME_JSON);
-    console.log("Successfully uploaded changes to S3");
 
+    try {
+        const raindrops = await getRaindrops(apiKey);
+        const trackerJson: TrackerJson[] = raindrops.map(raindropToTrackerJson);
+        const jsonString = JSON.stringify(trackerJson);
+        await putLatestToS3(context, jsonString, KEY_NAME_JSON);
+        console.log("Successfully uploaded changes to S3");
+
+        return {
+            statusCode: 200,
+            headers: { 'Content-Type': 'text/javascript' },
+            body: jsonString
+        };
+    } catch (error) {
+        console.error('Error fetching raindrops:', error);
+        return {
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Failed to fetch raindrops' })
+        };
+    }
+};
+
+const getRaindrops = async (accessToken: string): Promise<RaindropItem[]> => {
+    const client: RaindropApiClient = createRaindropApiClient(accessToken);
+    const targetCollectionTitle = 'tracked-reads';
+    const collections = await client.getCollections();
+    const targetCollection = collections.find(c => c.title === targetCollectionTitle);
+    
+    if (!targetCollection) {
+        throw new Error('No collection found with title "tracked-reads"');
+    }
+
+    return await client.getRaindrops(targetCollection._id);
+}
+
+const raindropToTrackerJson = (raindrop: RaindropItem): TrackerJson => {
     return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'text/javascript' },
-        body: jsonString
+        source: raindrop.domain,
+        title: raindrop.title,
+        url: raindrop.link
     };
 };
