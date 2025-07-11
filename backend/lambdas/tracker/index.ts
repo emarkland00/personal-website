@@ -7,9 +7,8 @@ import { RaindropItem } from './raindrop/interfaces/raindrop';
 // Load environment variables from .env file
 dotenv.config();
 
-const BUCKET_NAME = 'errolmarkland.com';
-const KEY_NAME_JSON = "assets/latest.json";
-const ACL = 'public-read';
+const BUCKET_NAME = process.env.S3_BUCKET_NAME || '';
+const KEY_NAME_JSON = process.env.S3_KEY_NAME_JSON || "assets/latest.json";
 const s3 = new S3Client();
 
 interface TrackerJson {
@@ -18,67 +17,64 @@ interface TrackerJson {
     url: string
 }
 
-async function putLatestToS3(context: Context, jsString: string, key: string) {
+async function putLatestToS3(jsString: string) {
     const params = new PutObjectCommand({
         Bucket: BUCKET_NAME,
-        Key: key,
+        Key: KEY_NAME_JSON,
         Body: jsString,
-        ACL
+        ACL: 'public-read',
+        ContentType: 'application/json'
     });
     
-    try {
-        await s3.send(params);
-        console.log(`Upload complete to ${key}`);       
-    } catch (err) {
-        console.log(`Upload failed to ${key}: ${err}`);
-        return;
-    }
+    await s3.send(params);
+    console.log(`Upload complete to ${KEY_NAME_JSON}`);
 }
 
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
     // pocket api constants
-    const apiKey: string = process.env.ACCESS_TOKEN || '';
-    if (!apiKey) {
-        console.error('No API key provided');
-        return {
-            statusCode: 500,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'API key is required' })
-        };
-    }
+    const accessToken: string = process.env.RAINDROP_ACCESS_TOKEN || '';
 
     try {
-        const raindrops = await getRaindrops(apiKey);
+        const raindrops = await getRaindrops(accessToken);
         const trackerJson: TrackerJson[] = raindrops.map(raindropToTrackerJson);
         const jsonString = JSON.stringify(trackerJson);
-        await putLatestToS3(context, jsonString, KEY_NAME_JSON);
+        await putLatestToS3(jsonString);
         console.log("Successfully uploaded changes to S3");
 
         return {
             statusCode: 200,
-            headers: { 'Content-Type': 'text/javascript' },
+            headers: { 'Content-Type': 'application/json' },
             body: jsonString
         };
     } catch (error) {
-        console.error('Error fetching raindrops:', error);
+        console.error('Error in handler:', error);
         return {
             statusCode: 500,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Failed to fetch raindrops' })
+            body: JSON.stringify({ error: 'Failed to process request' })
         };
     }
 };
 
 const getRaindrops = async (accessToken: string): Promise<RaindropItem[]> => {
     const client: RaindropApiClient = createRaindropApiClient(accessToken);
+    const collectionId = Number(process.env.RAINDROP_COLLECTION_ID);
+
+    if (!isNaN(collectionId) && collectionId > 0) {
+        console.log(`Using cached collection ID: ${collectionId}`);
+        return await client.getRaindrops(collectionId);
+    }
+    
     const targetCollectionTitle = 'tracked-reads';
+    console.log(`Fetching collections to find ID for "${targetCollectionTitle}"`);
     const collections = await client.getCollections();
     const targetCollection = collections.find(c => c.title === targetCollectionTitle);
     
     if (!targetCollection) {
-        throw new Error('No collection found with title "tracked-reads"');
+        throw new Error(`No collection found with title "${targetCollectionTitle}"`);
     }
 
+    console.log(`Found collection ID: ${targetCollection._id}`);
     return await client.getRaindrops(targetCollection._id);
 }
 

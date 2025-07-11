@@ -242,4 +242,9 @@ export interface RaindropsApiResponse {
    * The ID of the collection from which items were fetched.
    */
   collectionId: number;
+
+  /**
+   * An error message if the request was not successful.
+   */
+  errorMessage?: string;
 }

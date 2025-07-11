@@ -6,17 +6,19 @@ import { RaindropsApiResponse, RaindropItem } from './interfaces/raindrop';
 
 /**
  * A private helper function to centralize error handling for API calls.
- * It logs a descriptive error message and re-throws the error.
+ * It logs a descriptive error message and returns an Error object to be thrown.
  * @param error - The error object caught from the API call.
  * @param contextMessage - A message describing the context of the operation.
  */
-const handleApiError = (error: unknown, contextMessage: string): never => {
+const handleApiError = (error: unknown, contextMessage: string): Error => {
   let errorMessage = `${contextMessage}.`;
-  if (isAxiosError(error)) {
+  
+  if (axios.isAxiosError(error)) {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      errorMessage += ` Server responded with status ${error.response.status}: ${JSON.stringify(error.response.data)}`;
+      const apiErrorMessage = (error.response.data as RaindropsApiResponse | CollectionsApiResponse)?.errorMessage;
+      errorMessage += ` Server responded with status ${error.response.status}${apiErrorMessage ? `: ${apiErrorMessage}` : ''}`;
     } else if (error.request) {
       // The request was made but no response was received
       errorMessage += ' No response received from the server.';
@@ -24,14 +26,23 @@ const handleApiError = (error: unknown, contextMessage: string): never => {
       // Something happened in setting up the request that triggered an Error
       errorMessage += ` Error during request setup: ${error.message}`;
     }
-  } else if (error instanceof Error) {
+  } else if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as { response?: { status: number; data?: { errorMessage?: string } }, request?: any, message: string };
+      if(axiosError.response){
+        const apiErrorMessage = axiosError.response.data?.errorMessage;
+        errorMessage += ` Server responded with status ${axiosError.response.status}${apiErrorMessage ? `: ${apiErrorMessage}` : ''}`;
+      } else {
+        errorMessage += ` An unexpected error occurred: ${axiosError.message}`;
+      }
+  }
+  else if (error instanceof Error) {
     errorMessage += ` An unexpected error occurred: ${error.message}`;
   } else {
     errorMessage += ' An unknown error occurred.';
   }
 
   console.error(errorMessage);
-  throw new Error(errorMessage);
+  return new Error(errorMessage);
 };
 
 
@@ -42,6 +53,7 @@ const handleApiError = (error: unknown, contextMessage: string): never => {
  */
 export interface RaindropApiClient {
   /**
+   * 
    * Fetches all collections for the authenticated user.
    * @returns A promise that resolves to an array of CollectionItem objects.
    */
@@ -65,10 +77,9 @@ const getRaindropCollections = (client: AxiosInstance): () => Promise<Collection
       if (response.data.result) {
         return response.data.items;
       }
-      throw new Error('The Raindrop.io API indicated a failure in fetching collections.');
+      throw new Error(`The Raindrop.io API indicated a failure in fetching collections: ${response.data.errorMessage || 'Unknown Reason'}`);
     } catch (error) {
-      handleApiError(error, 'Failed to fetch collections');
-      return []; // This line will never be reached due to the error handling
+      throw handleApiError(error, 'Failed to fetch collections');
     }
   };
 }
@@ -80,10 +91,9 @@ const getRaindropItems = (client: AxiosInstance): (collectionId: number) => Prom
       if (response.data.result) {
         return response.data.items;
       }
-      throw new Error(`The Raindrop.io API indicated a failure in fetching raindrops for collection ID ${collectionId}.`);
+      throw new Error(`The Raindrop.io API indicated a failure in fetching raindrops for collection ID ${collectionId}: ${response.data.errorMessage || 'Unknown Reason'}`);
     } catch (error) {
-      handleApiError(error, `Failed to fetch raindrops for collection ID ${collectionId}`);
-      return []; // This line will never be reached due to the error handling
+      throw handleApiError(error, `Failed to fetch raindrops for collection ID ${collectionId}`);
     }
   };
 };

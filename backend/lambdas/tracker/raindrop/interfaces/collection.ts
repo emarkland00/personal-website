@@ -202,5 +202,10 @@ export interface CollectionsApiResponse {
    * An array of collection objects.
    */
   items: CollectionItem[];
+
+  /**
+   * An error message if the request was not successful.
+   */
+  errorMessage?: string;
 }
 
