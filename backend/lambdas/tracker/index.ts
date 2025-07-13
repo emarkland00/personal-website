@@ -9,6 +9,7 @@ dotenv.config();
 
 const BUCKET_NAME = process.env.S3_BUCKET_NAME || '';
 const KEY_NAME_JSON = process.env.S3_KEY_NAME_JSON || "assets/latest.json";
+const TARGET_COLLECTION_TITLE = process.env.RAINDROP_TARGET_COLLECTION_TITLE || 'tracked-reads';
 const s3 = new S3Client();
 
 interface TrackerJson {
@@ -64,14 +65,8 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
 
 const getRaindrops = async (accessToken: string): Promise<RaindropItem[]> => {
     const client: RaindropApiClient = createRaindropApiClient(accessToken);
-    const collectionId = Number(process.env.RAINDROP_COLLECTION_ID);
-
-    if (!isNaN(collectionId) && collectionId > 0) {
-        console.log(`Using cached collection ID: ${collectionId}`);
-        return await client.getRaindrops(collectionId);
-    }
     
-    const targetCollectionTitle = 'tracked-reads';
+    const targetCollectionTitle = TARGET_COLLECTION_TITLE;
     console.log(`Fetching collections to find ID for "${targetCollectionTitle}"`);
     const collections = await client.getCollections();
     const targetCollection = collections.find(c => c.title === targetCollectionTitle);

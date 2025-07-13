@@ -8,7 +8,6 @@ import { RaindropsApiResponse, RaindropItem } from './interfaces/raindrop';
  */
 export const RaindropErrorMessages = {
     MISSING_API_TOKEN: 'An API token is required to communicate with the Raindrop.io API.',
-    RAINDROP_API_ERROR: 'An error occurred while communicating with the Raindrop.io API.',
     COLLECTIONS_FETCH_ERROR: 'Failed to fetch collections from Raindrop.io.',
     RAINDROPS_FETCH_ERROR: 'Failed to fetch raindrops from Raindrop.io.',
 };
