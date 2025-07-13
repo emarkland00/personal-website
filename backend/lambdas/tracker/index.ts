@@ -25,9 +25,15 @@ async function putLatestToS3(jsString: string) {
         ACL: 'public-read',
         ContentType: 'application/json'
     });
-    
-    await s3.send(params);
-    console.log(`Upload complete to ${KEY_NAME_JSON}`);
+
+    try {
+        console.log(`Uploading to S3 bucket: ${BUCKET_NAME}, key: ${KEY_NAME_JSON}`);
+        await s3.send(params);
+        console.log(`Upload complete to ${KEY_NAME_JSON}`);
+    } catch (error) {
+        console.error('Error uploading to S3:', error);
+        throw new Error(`Failed to upload to S3: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
 }
 
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {

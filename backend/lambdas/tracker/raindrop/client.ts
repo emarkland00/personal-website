@@ -42,7 +42,7 @@ export interface RaindropErrorCause {
 const handleApiError = (error: unknown, contextMessage: string, code: string): Error => {
   let errorMessage = `${contextMessage}.`;
   
-  if (axios.isAxiosError(error)) {
+  if (isAxiosError(error)) {
     if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
