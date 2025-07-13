@@ -7,7 +7,7 @@ import { RaindropItem } from './raindrop/interfaces/raindrop';
 // Load environment variables from .env file
 dotenv.config();
 
-const BUCKET_NAME = process.env.S3_BUCKET_NAME || '';
+const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 const KEY_NAME_JSON = process.env.S3_KEY_NAME_JSON || "assets/latest.json";
 const TARGET_COLLECTION_TITLE = process.env.RAINDROP_TARGET_COLLECTION_TITLE || 'tracked-reads';
 const s3 = new S3Client();
@@ -40,9 +40,27 @@ async function putLatestToS3(jsString: string) {
 export const handler = async (event: APIGatewayEvent, context: Context): Promise<APIGatewayProxyResult> => {
     // pocket api constants
     const accessToken: string = process.env.RAINDROP_ACCESS_TOKEN || '';
+    if (!accessToken) {
+        console.error('Missing RAINDROP_ACCESS_TOKEN environment variable');
+        return {
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Internal Server Error: Missing access token' })
+        };
+    }
+
+    const s3BucketName: string = process.env.S3_BUCKET_NAME || '';
+    if (!s3BucketName) {
+        console.error('Missing S3_BUCKET_NAME environment variable');
+        return {
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Internal Server Error: Missing S3 bucket name' })
+        };
+    }
 
     try {
-        const raindrops = await getRaindrops(accessToken);
+        const raindrops = await fetchRaindropsFromCollection(accessToken);
         const trackerJson: TrackerJson[] = raindrops.map(raindropToTrackerJson);
         const jsonString = JSON.stringify(trackerJson);
         await putLatestToS3(jsonString);
@@ -63,7 +81,7 @@ export const handler = async (event: APIGatewayEvent, context: Context): Promise
     }
 };
 
-const getRaindrops = async (accessToken: string): Promise<RaindropItem[]> => {
+const fetchRaindropsFromCollection = async (accessToken: string): Promise<RaindropItem[]> => {
     const client: RaindropApiClient = createRaindropApiClient(accessToken);
     
     const targetCollectionTitle = TARGET_COLLECTION_TITLE;
