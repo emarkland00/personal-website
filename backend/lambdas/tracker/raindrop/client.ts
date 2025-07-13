@@ -2,6 +2,35 @@ import axios, { AxiosInstance, isAxiosError } from 'axios';
 import { CollectionsApiResponse, CollectionItem } from './interfaces/collection';
 import { RaindropsApiResponse, RaindropItem } from './interfaces/raindrop';
 
+
+/**
+ * Error messages for Raindrop API interactions.
+ */
+export const RaindropErrorMessages = {
+    MISSING_API_TOKEN: 'An API token is required to communicate with the Raindrop.io API.',
+    RAINDROP_API_ERROR: 'An error occurred while communicating with the Raindrop.io API.',
+    COLLECTIONS_FETCH_ERROR: 'Failed to fetch collections from Raindrop.io.',
+    RAINDROPS_FETCH_ERROR: 'Failed to fetch raindrops from Raindrop.io.',
+};
+
+export const RaindropApiErrorCodes = {
+  MissingApiToken: 'MISSING_API_TOKEN',
+  CollectionsFetchError: 'COLLECTIONS_FETCH_ERROR',
+  RaindropsFetchError: 'RAINDROPS_FETCH_ERROR',
+};
+
+export interface RaindropErrorCause {
+  /**
+   * A unique code representing the type of error.
+   */
+  code: string;
+
+  /**
+   * A human-readable message describing the error.
+   */
+  message: string;
+}
+
 // --- Private Helper Function ---
 
 /**
@@ -10,7 +39,7 @@ import { RaindropsApiResponse, RaindropItem } from './interfaces/raindrop';
  * @param error - The error object caught from the API call.
  * @param contextMessage - A message describing the context of the operation.
  */
-const handleApiError = (error: unknown, contextMessage: string): Error => {
+const handleApiError = (error: unknown, contextMessage: string, code: string): Error => {
   let errorMessage = `${contextMessage}.`;
   
   if (axios.isAxiosError(error)) {
@@ -42,7 +71,12 @@ const handleApiError = (error: unknown, contextMessage: string): Error => {
   }
 
   console.error(errorMessage);
-  return new Error(errorMessage);
+  return new Error(errorMessage, {
+    cause: {
+      code,
+      message: errorMessage,
+    } as RaindropErrorCause
+  });
 };
 
 
@@ -77,9 +111,14 @@ const getRaindropCollections = (client: AxiosInstance): () => Promise<Collection
       if (response.data.result) {
         return response.data.items;
       }
-      throw new Error(`The Raindrop.io API indicated a failure in fetching collections: ${response.data.errorMessage || 'Unknown Reason'}`);
+      throw new Error(`The Raindrop.io API indicated a failure in fetching collections: ${response.data.errorMessage || 'Unknown Reason'}`, {
+        cause: {
+          code: RaindropApiErrorCodes.CollectionsFetchError,
+          message: response.data.errorMessage || 'Unknown Reason',
+        } as RaindropErrorCause
+      });
     } catch (error) {
-      throw handleApiError(error, 'Failed to fetch collections');
+      throw handleApiError(error, 'Failed to fetch collections', RaindropApiErrorCodes.CollectionsFetchError);
     }
   };
 }
@@ -91,9 +130,14 @@ const getRaindropItems = (client: AxiosInstance): (collectionId: number) => Prom
       if (response.data.result) {
         return response.data.items;
       }
-      throw new Error(`The Raindrop.io API indicated a failure in fetching raindrops for collection ID ${collectionId}: ${response.data.errorMessage || 'Unknown Reason'}`);
+      throw new Error(`The Raindrop.io API indicated a failure in fetching raindrops for collection ID ${collectionId}: ${response.data.errorMessage || 'Unknown Reason'}`, { 
+        cause: {
+          code: RaindropApiErrorCodes.RaindropsFetchError,
+          message: response.data.errorMessage || 'Unknown Reason',
+        } as RaindropErrorCause
+      });
     } catch (error) {
-      throw handleApiError(error, `Failed to fetch raindrops for collection ID ${collectionId}`);
+      throw handleApiError(error, `Failed to fetch raindrops for collection ID ${collectionId}`, RaindropApiErrorCodes.RaindropsFetchError);
     }
   };
 };
@@ -105,7 +149,12 @@ const getRaindropItems = (client: AxiosInstance): (collectionId: number) => Prom
  */
 export const createRaindropApiClient = (apiToken: string): RaindropApiClient => {
   if (!apiToken) {
-    throw new Error('An API token is required to communicate with the Raindrop.io API.');
+    throw new Error(RaindropErrorMessages.MISSING_API_TOKEN, {
+      cause: {
+        code: RaindropApiErrorCodes.MissingApiToken,
+        message: RaindropErrorMessages.MISSING_API_TOKEN
+      } as RaindropErrorCause
+    });
   }
 
   const client: AxiosInstance = axios.create({

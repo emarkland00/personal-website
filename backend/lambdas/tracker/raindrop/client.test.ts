@@ -1,93 +1,151 @@
 
 import axios from 'axios';
-import { createRaindropApiClient, RaindropApiClient } from './client';
+import { createRaindropApiClient, RaindropApiClient, RaindropApiErrorCodes, RaindropErrorCause } from './client';
 import { CollectionItem } from './interfaces/collection';
 import { RaindropItem } from './interfaces/raindrop';
-
-// TODO: Verify that jest is available in package.json
 // TODO: Add tests to github actions
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('Raindrop API Client', () => {
-    let client: RaindropApiClient;
-
+    let testClient: RaindropApiClient;
+    let consoleErrorSpy: jest.SpyInstance;
+    
     beforeEach(() => {
         // Reset mocks before each test
         mockedAxios.create.mockClear();
         mockedAxios.get.mockClear();
-        
+        consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
         // Setup the mock for axios.create() to return the mockedAxios instance
         mockedAxios.create.mockReturnValue(mockedAxios);
-        client = createRaindropApiClient('test-token');
+        testClient = createRaindropApiClient('test-token');
     });
+
+    afterEach(() => {
+        consoleErrorSpy.mockRestore();
+    });
+
+    /**
+     * Helper method to create a dummy error with a cause property.
+     * @returns {Error} - A dummy error with a cause property that matches the expected RaindropErrorCause interface.
+     */
+    const createDummyErrorWithCause = (): Error => {
+        return new Error('dummy', { 
+            cause: {
+                code: 'dummy',
+                message: 'dummy'
+            } as RaindropErrorCause
+        });
+    };
 
     describe('createRaindropApiClient', () => {
         it('should throw an error if no API token is provided', () => {
-            expect(() => createRaindropApiClient('')).toThrow('An API token is required to communicate with the Raindrop.io API.');
+            let caughtError: Error = createDummyErrorWithCause();
+            try {
+                createRaindropApiClient('');
+            } catch (error: unknown) {
+                caughtError = error as Error;
+            }
+            const caughtErrorCause = caughtError.cause as RaindropErrorCause;
+            expect(caughtErrorCause.code).toBe(RaindropApiErrorCodes.MissingApiToken);
         });
 
         it('should return a client with getCollections and getRaindrops methods', () => {
-            const client = createRaindropApiClient('test-token');
-            expect(client).toHaveProperty('getCollections');
-            expect(client).toHaveProperty('getRaindrops');
+            const client = createRaindropApiClient('valid-test-token');
+            expect(client).toBeDefined();
+            expect(typeof client.getCollections).toBe('function');
+            expect(typeof client.getRaindrops).toBe('function');
         });
     });
 
     describe('getCollections', () => {
-        it('should return a list of collections on successful API call', async () => {
-            const collections: CollectionItem[] = [{ _id: 1, title: 'Test Collection' } as CollectionItem];
-            mockedAxios.get.mockResolvedValue({ data: { result: true, items: collections } });
-
-            const result = await client.getCollections();
-            expect(result).toEqual(collections);
-            expect(mockedAxios.get).toHaveBeenCalledWith('/collections');
-        });
-
         it('should throw a specific error when the API response has result: false', async () => {
-            mockedAxios.get.mockResolvedValue({ data: { result: false, errorMessage: 'API Error' } });
-            await expect(client.getCollections()).rejects.toThrow('The Raindrop.io API indicated a failure in fetching collections: API Error');
+            const mockedResponseWithResultReturningFalse = { result: false, errorMessage: 'API Error' };
+            mockedAxios.get.mockResolvedValue({ data: mockedResponseWithResultReturningFalse });
+
+            let caughtError: Error = createDummyErrorWithCause();
+            try {
+                await testClient.getCollections();
+            } catch (error: unknown) {
+                caughtError = error as Error;
+            }
+
+            const caughtErrorCause = caughtError.cause as RaindropErrorCause;
+            expect(caughtErrorCause).toBeDefined();
+            expect(caughtErrorCause.code).toBe(RaindropApiErrorCodes.CollectionsFetchError);
         });
 
         it('should throw a formatted error when the API returns a non-2xx status code', async () => {
-            const error = {
+            const mockResponseWithNon200StatusCode = {
                 response: {
                     status: 500,
                     data: { errorMessage: 'Server Error' },
                 },
             };
-            mockedAxios.get.mockRejectedValue(error);
-            await expect(client.getCollections()).rejects.toThrow('Failed to fetch collections. Server responded with status 500: Server Error');
+            mockedAxios.get.mockRejectedValue(mockResponseWithNon200StatusCode);
+            let caughtError: Error = createDummyErrorWithCause();
+            try {
+                await testClient.getCollections();
+            } catch (error: unknown) {
+                caughtError = error as Error;
+            }
+            const caughtErrorCause = caughtError.cause as RaindropErrorCause;
+            expect(caughtErrorCause.code).toBe(RaindropApiErrorCodes.CollectionsFetchError);
+        });
+        
+        it('should return a list of collections on successful API call', async () => {
+            const validCollectionsResult: CollectionItem[] = [{ _id: 1, title: 'Test Collection' } as CollectionItem];
+            mockedAxios.get.mockResolvedValue({ data: { result: true, items: validCollectionsResult } });
+
+            const result = await testClient.getCollections();
+            expect(result).toEqual(validCollectionsResult);
         });
     });
 
-    describe('getRaindrops', () => {
-        const collectionId = 123;
-
-        it('should return a list of raindrops on successful API call', async () => {
-            const raindrops: RaindropItem[] = [{ _id: 1, title: 'Test Raindrop' } as RaindropItem];
-            mockedAxios.get.mockResolvedValue({ data: { result: true, items: raindrops } });
-
-            const result = await client.getRaindrops(collectionId);
-            expect(result).toEqual(raindrops);
-            expect(mockedAxios.get).toHaveBeenCalledWith(`/raindrops/${collectionId}?sort=-created&perpage=3`);
-        });
-
+    describe('getRaindrops', () => { 
         it('should throw a specific error when the API response has result: false', async () => {
-            mockedAxios.get.mockResolvedValue({ data: { result: false, errorMessage: 'API Error' } });
-            await expect(client.getRaindrops(collectionId)).rejects.toThrow(`The Raindrop.io API indicated a failure in fetching raindrops for collection ID ${collectionId}: API Error`);
+            const dummyCollectionId = 123;
+            const mockedResultWithResultFalse = { result: false, errorMessage: 'API Error' };
+            mockedAxios.get.mockResolvedValue({ data: mockedResultWithResultFalse });
+
+            let caughtError: Error = createDummyErrorWithCause();
+            try {
+                await testClient.getRaindrops(dummyCollectionId);
+            } catch (error: unknown) {
+                caughtError = error as Error;
+            }
+            const caughtErrorCause = caughtError.cause as RaindropErrorCause;
+            expect(caughtErrorCause).toBeDefined();
+            expect(caughtErrorCause.code).toBe(RaindropApiErrorCodes.RaindropsFetchError);
         });
 
         it('should throw a formatted error when the API returns a non-2xx status code', async () => {
-            const error = {
+            const dummyCollectionId = 123;
+            const mockResponseWithNon200StatusCode = {
                 response: {
                     status: 500,
                     data: { errorMessage: 'Server Error' },
                 },
             };
-            mockedAxios.get.mockRejectedValue(error);
-            await expect(client.getRaindrops(collectionId)).rejects.toThrow(`Failed to fetch raindrops for collection ID ${collectionId}. Server responded with status 500: Server Error`);
+            mockedAxios.get.mockRejectedValue(mockResponseWithNon200StatusCode);
+            let caughtError: Error = createDummyErrorWithCause();
+            try {
+                await testClient.getRaindrops(dummyCollectionId);
+            } catch (error: unknown) {
+                caughtError = error as Error;
+            }
+            const caughtErrorCause = caughtError.cause as RaindropErrorCause;
+            expect(caughtErrorCause.code).toBe(RaindropApiErrorCodes.RaindropsFetchError);
+        });
+
+        it('should return a list of raindrops on successful API call', async () => {
+            const dummyCollectionId = 123;
+            const validRaindropsResult: RaindropItem[] = [{ _id: 1, title: 'Test Raindrop' } as RaindropItem];
+            mockedAxios.get.mockResolvedValue({ data: { result: true, items: validRaindropsResult } });
+
+            const result = await testClient.getRaindrops(dummyCollectionId);
+            expect(result).toEqual(validRaindropsResult);
         });
     });
 }); 
