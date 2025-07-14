@@ -20,7 +20,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::\${{ secrets.AWS_ACCOUNT_ID }}:role/\${{ secrets.AWS_IAM_ROLE }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_IAM_ROLE }}
           aws-region: us-east-1
 
       - name: Set up Docker Buildx
@@ -29,22 +29,22 @@ jobs:
       - name: Log in to Amazon ECR
         uses: docker/login-action@v3
         with:
-          registry: \${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+          registry: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
 
       - name: Build and push Docker image
         env:
-          ECR_REPO_NAME: \${{ secrets.ECR_REPO_NAME }}
-          COMMIT_HASH: \${{ github.sha }}
+          ECR_REPO_NAME: ${{ secrets.ECR_REPO_NAME }}
+          COMMIT_HASH: ${{ github.sha }}
         run: |
           cd backend/lambdas/tracker
           docker build --platform linux/amd64 -f Dockerfile.lambda -t $ECR_REPO_NAME:$COMMIT_HASH .
-          docker tag $ECR_REPO_NAME:$COMMIT_HASH \${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/$ECR_REPO_NAME:$COMMIT_HASH
-          docker push \${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/$ECR_REPO_NAME:$COMMIT_HASH
+          docker tag $ECR_REPO_NAME:$COMMIT_HASH ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/$ECR_REPO_NAME:$COMMIT_HASH
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/$ECR_REPO_NAME:$COMMIT_HASH
 
       - name: Update Lambda Function
         env:
-          LAMBDA_FUNCTION_NAME: \${{ secrets.LAMBDA_FUNCTION_NAME }}
-          ECR_REPO_NAME: \${{ secrets.ECR_REPO_NAME }}
-          COMMIT_HASH: \${{ github.sha }}
+          LAMBDA_FUNCTION_NAME: ${{ secrets.LAMBDA_FUNCTION_NAME }}
+          ECR_REPO_NAME: ${{ secrets.ECR_REPO_NAME }}
+          COMMIT_HASH: ${{ github.sha }}
         run: |
-          aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --image-uri \${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/$ECR_REPO_NAME:$COMMIT_HASH
+          aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --image-uri ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/$ECR_REPO_NAME:$COMMIT_HASH
