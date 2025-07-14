@@ -42,7 +42,7 @@ RUN npm install --include=dev --legacy-peer-deps && \
 
 
 # Build the app for production
-FROM nginx:1.25-bookworm as prod-builder
+FROM nginx:1.29-bookworm as prod-builder
 ARG NODE_ENV
 ARG WORKDIR
 WORKDIR ${WORKDIR}
