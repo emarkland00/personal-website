@@ -1,146 +1,152 @@
 <main class="main">
   <nav id="nav">
     <ul class="container">
-        <li><a href="#top">Top</a></li>
-        <li><a href="#articles">Articles</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="../assets/errol_resume.pdf">Resume</a></li>
-        <li><a href="https://marklandbytes.com">Markland Bytes</a></li>
+      <li><a href="#top">Top</a></li>
+      <li><a href="#articles">Articles</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="../assets/errol_resume.pdf">Resume</a></li>
+      <li><a href="https://marklandbytes.com">Markland Bytes</a></li>
     </ul>
-</nav>
+  </nav>
 
-<!-- Home -->
-<div class="wrapper style1 first">
+  <!-- Home -->
+  <div class="wrapper style1 first">
     <article class="container" id="top">
-        <div class="row">
-            <div class="4u 12u(mobile)">
-                <span class="image fit">
-                    <img src="../assets/images/me_mar_2022.jpg" alt="My picture" style="border-radius: 2px;" />
-                </span>
-            </div>
-            <div class="8u 12u(mobile)">
-                <header>
-                    <h1>Errol G. Markland Jr.</h1>
-                </header>
-                <p>A developer who likes to explore the various venues of technology.</p>
-                <a href="#contact" class="button big scrolly">Get in touch with me</a>
-            </div>
+      <div class="row">
+        <div class="4u 12u(mobile)">
+          <span class="image fit">
+            <img src="../assets/images/me_mar_2022.jpg" alt="My picture" style="border-radius: 2px;" />
+          </span>
         </div>
+        <div class="8u 12u(mobile)">
+          <header>
+            <h1>Errol G. Markland Jr.</h1>
+          </header>
+          <p>A developer who likes to explore the various venues of technology.</p>
+          <a href="#contact" class="button big scrolly">Get in touch with me</a>
+        </div>
+      </div>
     </article>
-</div>
+  </div>
 
-<!-- Articles -->
-<div class="wrapper style2">
+  <!-- Articles -->
+  <div class="wrapper style2">
     <article id="articles">
-        <header>
-            <h2>Here are some articles that I have read lately.</h2>
-        </header>
-        <div class="container" id="latest-articles">
-            <div class="row" id="latest-entry-content">
-              <div *ngIf="!(hasItems$ | async)">
-                <p>Content coming soon!</p>
-              </div>
-
-              <div *ngFor="let item of latestJson$ | async" class="4u 12u(mobile) article-item">
-                  <a href="{{item.url}}" target="_blank">
-                      <section class="box style1">
-                          <h4>{{item.title}}</h4>
-                          <p> <span class="latest-entry-content-item-source">[saw on {{item.source}}]</span></p> 
-                      </section>
-                  </a>
-              </div>
+      <header>
+        <h2>Here are some articles that I have read lately.</h2>
+      </header>
+      <div class="container" id="latest-articles">
+        <div class="row" id="latest-entry-content">
+          @if (!(hasItems$ | async)) {
+            <div>
+              <p>Content coming soon!</p>
             </div>
+          }
+
+          @for (item of latestJson$ | async; track item) {
+            <div class="4u 12u(mobile) article-item">
+              <a href="{{item.url}}" target="_blank">
+                <section class="box style1">
+                  <h4>{{item.title}}</h4>
+                  <p> <span class="latest-entry-content-item-source">[saw on {{item.source}}]</span></p>
+                </section>
+              </a>
+            </div>
+          }
         </div>
-        <footer *ngIf="hasItems$ | async" id='article-footer'>
-            Powered by the <a href="https://raindrop.io/" target="_blank">Raindrop API</a>.
+      </div>
+      @if (hasItems$ | async) {
+        <footer id='article-footer'>
+          Powered by the <a href="https://raindrop.io/" target="_blank">Raindrop API</a>.
         </footer>
+      }
     </article>
-</div>
+  </div>
 
-<!-- Projects -->
-<div class="wrapper style3">
+  <!-- Projects -->
+  <div class="wrapper style3">
     <article id="projects">
-        <div class="container">
-            <header>
-                <h2>Projects</h2>
-                <p>
-                    Some of the projects that I have worked on can be found at my
-                    <a href="https://github.com/emarkland00" target="_blank">Github</a>.
-                </p>
-            </header>
+      <div class="container">
+        <header>
+          <h2>Projects</h2>
+          <p>
+            Some of the projects that I have worked on can be found at my
+            <a href="https://github.com/emarkland00" target="_blank">Github</a>.
+          </p>
+        </header>
 
-            <div class="row">
-                <!-- Hide API for now -->
-                <!-- <div class="4u 12u(mobile)">
-                    <article class="box style2">
-                        <a href="https://emarkland00.github.io/address-format/" class="image featured project-image">
-                            <img src="../assets/images/address-format.png" alt="address format screenshot" />
-                        </a>
-                        <h3><a href="https://emarkland00.github.io/address-format/">Address Format API</a></h3>
-                        <p>API for determining address formats as well as how to convert from one address format to another.</p>
-                    </article>
-                </div> -->
-                <div class="4u 12u(mobile)">
-                    <article class="box style2">
-                        <a href="https://marklandbytes.com" class="image featured project-image">
-                            <img src="../assets/images/markland_bytes.png" alt="markland bytes screenshot" />
-                        </a>
-                        <h3><a href="https://marklandbytes.com">Markland Bytes</a></h3>
-                        <p>Consulting company for web application and API development</p>
-                    </article>
-                </div>
-            </div>
+        <div class="row">
+          <!-- Hide API for now -->
+          <!-- <div class="4u 12u(mobile)">
+          <article class="box style2">
+            <a href="https://emarkland00.github.io/address-format/" class="image featured project-image">
+              <img src="../assets/images/address-format.png" alt="address format screenshot" />
+            </a>
+            <h3><a href="https://emarkland00.github.io/address-format/">Address Format API</a></h3>
+            <p>API for determining address formats as well as how to convert from one address format to another.</p>
+          </article>
+        </div> -->
+        <div class="4u 12u(mobile)">
+          <article class="box style2">
+            <a href="https://marklandbytes.com" class="image featured project-image">
+              <img src="../assets/images/markland_bytes.png" alt="markland bytes screenshot" />
+            </a>
+            <h3><a href="https://marklandbytes.com">Markland Bytes</a></h3>
+            <p>Consulting company for web application and API development</p>
+          </article>
         </div>
-    </article>
+      </div>
+    </div>
+  </article>
 </div>
 
 <!-- Contact -->
 <div class="wrapper style4">
-    <article id="contact" class="container 75%">
-        <header>
-            <h2>Let's chat!</h2>
-            <p>Feel free to reach out to me. Whether if it's to network, to do some business, or even just to say hey.</p>
-        </header>
-        <div>
-            <div class="row">
-                <div class="12u">
-                    <ul class="social">
-                        <li>
-                            <a href="https://www.linkedin.com/in/errol-markland-80967431" target="_blank" class="icon fa-linkedin">
-                                <span class="label">LinkedIn</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="https://github.com/emarkland00" target="_blank" class="icon fa-github">
-                                <span class="label">Github</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="https://twitter.com/mr_markland" target="_blank" class="icon fa-twitter">
-                                <span class="label">Twitter</span>
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="https://www.instagram.com/mr_markland/" target="_blank" class="icon fa-instagram">
-                                <span class="label">Instagram</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <hr />
-                </div>
-            </div>
-        </div>
-        <footer>
-            <ul id="copyright">
-              <li>&copy; 2025 Errol Markland. All rights reserved.
+  <article id="contact" class="container 75%">
+    <header>
+      <h2>Let's chat!</h2>
+      <p>Feel free to reach out to me. Whether if it's to network, to do some business, or even just to say hey.</p>
+    </header>
+    <div>
+      <div class="row">
+        <div class="12u">
+          <ul class="social">
+            <li>
+              <a href="https://www.linkedin.com/in/errol-markland-80967431" target="_blank" class="icon fa-linkedin">
+                <span class="label">LinkedIn</span>
+              </a>
             </li>
-            </ul>
-        </footer>
-    </article>
+
+            <li>
+              <a href="https://github.com/emarkland00" target="_blank" class="icon fa-github">
+                <span class="label">Github</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="https://twitter.com/mr_markland" target="_blank" class="icon fa-twitter">
+                <span class="label">Twitter</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="https://www.instagram.com/mr_markland/" target="_blank" class="icon fa-instagram">
+                <span class="label">Instagram</span>
+              </a>
+            </li>
+          </ul>
+          <hr />
+        </div>
+      </div>
+    </div>
+    <footer>
+      <ul id="copyright">
+        <li>&copy; 2025 Errol Markland. All rights reserved.
+        </li>
+      </ul>
+    </footer>
+  </article>
 </div>
 
 </main>

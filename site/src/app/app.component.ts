@@ -1,17 +1,17 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [CommonModule, RouterOutlet, HttpClientModule],
-  templateUrl: './app.component.html',
-  styleUrls: [ './app.component.sass' ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+    selector: 'app-root',
+    imports: [CommonModule, RouterOutlet],
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.sass'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true
 })
 export class AppComponent implements OnInit {
   readonly ID_ARTICLE_CONTENT: string = 'latest-articles';
@@ -30,7 +30,6 @@ export class AppComponent implements OnInit {
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
-    //TODO: Get lambda function for latest articles stored in a repo
     this.latestJson$ = this.http.get<any[]>('/assets/latest.json').pipe(
       catchError(err => {
         console.log(err);
