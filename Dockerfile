@@ -8,7 +8,7 @@ ARG WORKDIR=/code
 # app-base -> app-build-base -> prod-builder
 #          -> dev-runner 
 
-FROM node:20.9.0-bookworm-slim as app-base
+FROM node:20.19.4-bookworm-slim as app-base
 # Install system dependencies
 RUN apt-get update && apt-get install -y
 
@@ -24,7 +24,7 @@ WORKDIR ${WORKDIR}
 COPY ./site/ /code/
 RUN npm install
 
-FROM node:20.9.0-bookworm-slim as app-build-base
+FROM node:20.19.4-bookworm-slim as app-build-base
 # Install system dependencies
 RUN apt-get update && apt-get install -y
 COPY --from=app-base /code /code
@@ -62,7 +62,7 @@ CMD ["nginx", "-g", "daemon off;"]
 
 
 # Run the app in development mode
-FROM node:20.9.0-bookworm-slim as dev-runner
+FROM node:20.19.4-bookworm-slim as dev-runner
 ARG NODE_ENV
 ARG WORKDIR
 WORKDIR ${WORKDIR}
