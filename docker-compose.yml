@@ -6,8 +6,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dev-runner
-      args:
-        - NODE_ENV=development
     ports:
       - "4200:4200"
     container_name: "website"

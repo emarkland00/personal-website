@@ -5,73 +5,37 @@ ARG NODE_ENV=production
 ARG WORKDIR=/code
 
 # build flows
-# app-base -> app-build-base -> prod-builder
-#          -> dev-runner 
+# base -> builder -> prod-runner
+#      -> dev-runner
 
-FROM node:20.9.0-bookworm-slim as app-base
-# Install system dependencies
-RUN apt-get update && apt-get install -y
-
-# Input arguments
-ARG NODE_ENV
-ARG WORKDIR
-
-ENV NODE_ENV=${NODE_ENV}
-# Set working directory
+# Base stage for installing dependencies
+FROM node:22.12.0-bookworm-slim as base
+ARG WORKDIR=/code
 WORKDIR ${WORKDIR}
 
-# Copy app source
-COPY ./site/ /code/
-RUN npm install
+# Copy package files and install dependencies
+COPY ./site/package*.json ./
+RUN npm install --include=dev --legacy-peer-deps
 
-FROM node:20.9.0-bookworm-slim as app-build-base
-# Install system dependencies
-RUN apt-get update && apt-get install -y
-COPY --from=app-base /code /code
+# Copy the rest of the application source
+COPY ./site/ ./
 
-# Input arguments
-ARG NODE_ENV
-ARG WORKDIR
+# Stage for building the production application
+FROM base as builder
+RUN npm run docker:build:prod
 
-ENV NODE_ENV=${NODE_ENV}
-# Set working directory
-WORKDIR ${WORKDIR}
-
-RUN npm install --include=dev --legacy-peer-deps && \
-    npm run docker:build:prod
-
-
-# Build the app for production
-FROM nginx:1.25-bookworm as prod-builder
-ARG NODE_ENV
-ARG WORKDIR
-WORKDIR ${WORKDIR}
-ENV NODE_ENV=${NODE_ENV}
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y
-
-# Copy installed dependencies from builder
-COPY --from=app-build-base /code/dist/site/browser /usr/share/nginx/html
-
-# Copy the nginx configuration
-COPY nginx/nginx.conf  /etc/nginx/conf.d/default.conf
-
+# Production runner stage
+FROM nginx:1.29-bookworm as prod-runner
+# Copy built artifacts from the builder stage
+COPY --from=builder /code/dist/site/browser /usr/share/nginx/html
+# Copy nginx configuration
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
 
-
-# Run the app in development mode
-FROM node:20.9.0-bookworm-slim as dev-runner
-ARG NODE_ENV
-ARG WORKDIR
-WORKDIR ${WORKDIR}
-ENV NODE_ENV=${NODE_ENV}
-COPY --from=app-base /code /code
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y
-
-RUN npm install -g npm-check-updates @angular/cli && \
-    npm install --include=dev --legacy-peer-deps
+# Development runner stage
+FROM base as dev-runner
+# Install global CLI tools
+RUN npm install -g npm-check-updates @angular/cli
+# Set the command to run in development
 CMD [ "npm", "run", "docker:dev" ]
