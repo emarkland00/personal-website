@@ -1,13 +1,50 @@
-version: "3.8"
-   
 services:
   website:
     build:
-      context: .
+      context: ./site
       dockerfile: Dockerfile
       target: dev-runner
     ports:
       - "4200:4200"
     container_name: "website"
     volumes:
-      - ./site/src/:/code/src/
+      - ./site/:/code/
+      - site_node_modules:/code/node_modules
+  
+  lambda-tracker:
+    build:
+      context: ./backend/lambdas/tracker
+      dockerfile: Dockerfile.lambda
+    ports:
+      - "9000:8080"
+    volumes:
+      - ./backend/lambdas/tracker:/usr/app
+      - lambda_node_modules:/usr/app/node_modules
+    env_file:
+      - ./backend/lambdas/tracker/.env
+    environment:
+      - NODE_ENV=development
+    platform: linux/amd64
+  
+  lambda-tracker-test:
+    build:
+      context: ./backend/lambdas/tracker
+      dockerfile: Dockerfile.lambda
+    working_dir: /usr/app
+    volumes:
+      - ./backend/lambdas/tracker:/usr/app
+      - lambda_test_node_modules:/usr/app/node_modules
+    env_file:
+      - ./backend/lambdas/tracker/.env
+    entrypoint: ["/bin/sh", "-c", "npm install && npm test"]
+
+
+volumes:
+  site_node_modules:
+    driver: local
+  
+  lambda_node_modules:
+    driver: local
+
+  lambda_test_node_modules:
+    driver: local

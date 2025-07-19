@@ -14,11 +14,11 @@ ARG WORKDIR=/code
 WORKDIR ${WORKDIR}
 
 # Copy package files and install dependencies
-COPY ./site/package*.json ./
+COPY package*.json .
 RUN npm install --include=dev --legacy-peer-deps
 
 # Copy the rest of the application source
-COPY ./site/ ./
+COPY . .
 
 # Stage for building the production application
 FROM base as builder
