@@ -1,6 +1,8 @@
-@import 'libs/vars';
-@import 'libs/functions';
-@import 'libs/mixins';
+@use 'libs/vars';
+@use 'libs/functions';
+@use 'libs/mixins';
+@use "libs/skel";
+
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,600,600italic,700');
 @import url('../style/font-awesome.min.css');
 
@@ -10,15 +12,13 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
-	@import "libs/skel";
-
-	@include skel-breakpoints((
+	@include skel.skel-breakpoints((
 		desktop: '(min-width: 737px)',
 		tablet: '(min-width: 737px) and (max-width: 1200px)',
 		mobile: '(max-width: 736px)'
 	));
 
-	@include skel-layout((
+	@include skel.skel-layout((
 		reset: 'full',
 		boxModel: 'border',
 		grid: true,
@@ -55,13 +55,13 @@
 		font-weight: 300;
 
 		&.is-loading * {
-			@include vendor('transition', 'none !important');
-			@include vendor('animation', 'none !important');
+			@include skel.vendor('transition', 'none !important');
+			@include skel.vendor('animation', 'none !important');
 		}
 	}
 
 	a {
-		@include vendor('transition', 'color .2s ease-in-out');
+		@include skel.vendor('transition', 'color .2s ease-in-out');
 		color: #43B3E0;
 		text-decoration: underline;
 
@@ -157,7 +157,7 @@
 		input[type=password],
 		select,
 		textarea {
-			@include vendor('transition', ('background .2s ease-in-out', 'box-shadow .2s ease-in-out'));
+			@include skel.vendor('transition', ('background .2s ease-in-out', 'box-shadow .2s ease-in-out'));
 			display: block;
 			border: 0;
 			padding: 0.75em;
@@ -296,8 +296,8 @@
 	input[type="reset"],
 	button,
 	.button {
-		@include vendor('background-image', ('url("images/bg.png")', 'linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2))'));
-		@include vendor('transition', 'background-color .2s ease-in-out');
+		@include skel.vendor('background-image', ('url("images/bg.png")', 'linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2))'));
+		@include skel.vendor('transition', 'background-color .2s ease-in-out');
 		position: relative;
 		display: inline-block;
 		color: #fff !important;
@@ -360,7 +360,7 @@
 				top: 0;
 
 				a {
-					@include vendor('transition', 'top .2s ease-in-out');
+					@include skel.vendor('transition', 'top .2s ease-in-out');
 					display: block;
 					width: 48px;
 					height: 48px;
@@ -369,8 +369,8 @@
 					position: relative;
 
 					&:before {
-						@include vendor('background-image', ('url("images/bg.png")', 'linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2))'));
-						@include vendor('transition', 'background-color .2s ease-in-out');
+						@include skel.vendor('background-image', ('url("images/bg.png")', 'linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2))'));
+						@include skel.vendor('transition', 'background-color .2s ease-in-out');
 						background-color: #444;
 						border-radius: 6px;
 						box-shadow: inset 0px 0px 0px 1px #282828, inset 0px 2px 1px 0px rgba(255, 255, 255, 0.1);
@@ -644,7 +644,7 @@
 		color: #666;
 
 		a {
-			@include vendor('transition', 'color .2s ease-in-out');
+			@include skel.vendor('transition', 'color .2s ease-in-out');
 			color: inherit;
 
 			&:hover {
@@ -655,7 +655,7 @@
 
 /* Desktop */
 
-	@include breakpoint(desktop) {
+	@include skel.breakpoint(desktop) {
 
 		/* Basic */
 
@@ -768,7 +768,7 @@
 		/* Nav */
 			#nav {
 				a {
-					@include vendor('transition', 'background-color .2s ease-in-out');
+					@include skel.vendor('transition', 'background-color .2s ease-in-out');
 					padding: 0.2em 1em 0.2em 1em;
 					margin: 0.6em 0.2em 0.6em 0.2em;
 					font-weight: 600;
@@ -837,7 +837,7 @@
 
 /* Tablet */
 
-	@include breakpoint(tablet) {
+	@include skel.breakpoint(tablet) {
 
 		/* Basic */
 
@@ -886,7 +886,7 @@
 
 /* Mobile */
 
-	@include breakpoint(mobile) {
+	@include skel.breakpoint(mobile) {
 
 		/* Basic */
 
