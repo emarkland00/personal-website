@@ -1,9 +1,11 @@
-name: PR Check
+name: PR Check - Backend Tracker Lambda
 
 on:
   pull_request:
     branches: [ main ]
-
+    
+    paths:
+      - 'backend/lambdas/tracker/**'
 jobs:
   test:
     runs-on: ubuntu-latest

@@ -28,6 +28,7 @@ interface ArticleItem {
     standalone: true
 })
 export class AppComponent implements OnInit {
+  public readonly TITLE: string = 'Errol G. Markland Jr.';
   readonly ID_ARTICLE_CONTENT: string = 'latest-articles';
   readonly ID_ARTICLE_CONTENT_ENTRY: string = 'latest-entry-content';
   readonly ID_ARTICLE_FOOTER: string = 'article-footer';
