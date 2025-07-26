@@ -38,6 +38,17 @@ services:
       - ./backend/lambdas/tracker/.env
     entrypoint: ["/bin/sh", "-c", "npm install && npm test"]
 
+  website-test:
+    build:
+      context: ./site
+      dockerfile: Dockerfile
+      target: dev-runner
+    working_dir: /code
+    volumes:
+      - ./site/:/code/
+      - site_test_node_modules:/code/node_modules
+    entrypoint: ["/bin/sh", "-c", "npm install && npm run test:ci"]
+
 
 volumes:
   site_node_modules:
@@ -47,4 +58,7 @@ volumes:
     driver: local
 
   lambda_test_node_modules:
+    driver: local
+
+  site_test_node_modules:
     driver: local
