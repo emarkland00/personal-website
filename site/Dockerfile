@@ -9,7 +9,7 @@ ARG WORKDIR=/code
 #      -> dev-runner
 
 # Base stage for installing dependencies
-FROM node:22.17.1-bookworm-slim as base
+FROM node:22.18.0-bookworm-slim as base
 ARG WORKDIR=/code
 WORKDIR ${WORKDIR}
 
