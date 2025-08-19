@@ -1,6 +1,3 @@
-/** This was AI generated using google gemini */
-
-
 /**
  * Defines the structure of a reference to a user,
  * commonly used within collection data.

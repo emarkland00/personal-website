@@ -2,7 +2,6 @@ import axios, { AxiosInstance, isAxiosError } from 'axios';
 import { CollectionsApiResponse, CollectionItem } from './interfaces/collection';
 import { RaindropsApiResponse, RaindropItem } from './interfaces/raindrop';
 
-
 /**
  * Error messages for Raindrop API interactions.
  */
