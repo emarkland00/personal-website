@@ -1,6 +1,6 @@
 # Lambda for article tracker
 
-This lambda fetches the latest articles that were tracked using the pocket API.
+This lambda fetches the latest articles that were tracked using the [Raindrop.io API](https://developer.raindrop.io/)
 
 # How to Run Locally with Docker Compose
 
