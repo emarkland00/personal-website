@@ -3,7 +3,6 @@ import axios from 'axios';
 import { createRaindropApiClient, RaindropApiClient, RaindropApiErrorCodes, RaindropErrorCause } from './client';
 import { CollectionItem } from './interfaces/collection';
 import { RaindropItem } from './interfaces/raindrop';
-// TODO: Add tests to github actions
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
