@@ -24,7 +24,5 @@ jobs:
       working-directory: ./backend/lambdas/tracker
 
     - name: Run unit tests
-      env:
-        RAINDROP_ACCESS_TOKEN: ${{ secrets.RAINDROP_ACCESS_TOKEN }}
       run: npm test
       working-directory: ./backend/lambdas/tracker
