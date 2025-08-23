@@ -33,6 +33,6 @@
     "jest": "^30.0.0",
     "jest-preset-angular": "^14.0.3",
     "less": "^4.4.0",
-    "typescript": "~5.8.3"
+    "typescript": "~5.9.0"
   }
 }
