@@ -35,6 +35,6 @@
     "jest-preset-angular": "^16.0.0",
     "jsdom": "^29.0.0",
     "less": "^4.4.2",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.0"
   }
 }
