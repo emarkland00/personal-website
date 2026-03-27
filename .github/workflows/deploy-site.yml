@@ -31,7 +31,7 @@ jobs:
       - name: Build Website
         run: |
           cd site
-          npm install
+          npm install --legacy-peer-deps
           npm run docker:build:prod
 
       - name: Deploy to S3
