@@ -9,7 +9,7 @@ ARG WORKDIR=/code
 #      -> dev-runner
 
 # Base stage for installing dependencies
-FROM node:24.19-trixie-slim as base
+FROM node:24.20-trixie-slim as base
 ARG WORKDIR=/code
 WORKDIR ${WORKDIR}
 
